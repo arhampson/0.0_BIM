@@ -1,4 +1,5 @@
 layout:
     - Purge_DetailLine
     - Purge_UnusedLineStyles
+    - Purge_UnusedViewTemplates
     

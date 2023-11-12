@@ -1,0 +1,111 @@
+{
+  "Uuid": "4f0d83c6-8f07-4eeb-929e-a5e90f9d0940",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "script",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System import Array\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\n\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Current doc/app/ui\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\n# Get all view templates\r\nTemplateIds_All = []\r\n\r\nfor view in FilteredElementCollector(doc).OfClass(View):\r\n    if view.IsTemplate:\r\n        TemplateIds_All.append(view.Id.IntegerValue)\r\n        \r\n # Get view with templates\r\nTemplateIds_InUse = []\r\n\r\nfor view in FilteredElementCollector(doc).OfClass(View):\r\n    if view.IsTemplate:\r\n        continue\r\n        \r\n    templateId = view.ViewTemplateId\r\n    if templateId.IntegerValue != -1:\r\n        TemplateIds_InUse.append(templateId.IntegerValue)\r\n        \r\n#Compare TemplateIds_All and TemplateIds_InUse to determine what view templates to delete\r\nTemplateIds_ToDelete = List[ElementId]()\r\n\r\nfor idInt in TemplateIds_All:\r\n    if idInt in TemplateIds_InUse:\r\n        continue\r\n    TemplateIds_ToDelete.Add(ElementId(idInt))\r\n\r\n#Open transaction to delete revit element\r\n\r\nTransactionManager.Instance.EnsureInTransaction(doc)\r\n# your actions\r\n\r\n\r\ndoc.Delete(TemplateIds_ToDelete)\r\n\r\n\r\nTransactionManager.Instance.TransactionTaskDone()\r\n# Assign your output to the OUT variable.\r\nOUT = TemplateIds_ToDelete",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "0c333185f51e43a284052d3da8083ea1",
+      "Inputs": [
+        {
+          "Id": "eb666ab0e0b94c57835caa01f780903a",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "1cdc54e06cb04778970a8f013bc814dd",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.13",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "2.0",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.13.1.3887",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "0c333185f51e43a284052d3da8083ea1",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 639.0,
+        "Y": 170.0
+      }
+    ],
+    "Annotations": [],
+    "X": 0.0,
+    "Y": 0.0,
+    "Zoom": 1.0
+  }
+}
