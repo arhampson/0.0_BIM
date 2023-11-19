@@ -1,0 +1,111 @@
+{
+  "Uuid": "3e122072-a6f4-40e2-ad18-d4ffbd3aabd4",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "keynote file path",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import clr\r\n\r\nimport os\r\n\r\nimport subprocess\r\n\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\n\r\n# Current doc/app/ui\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\n\r\n#get KeynoteTable file path\r\nkeynoteTable = KeynoteTable.GetKeynoteTable(doc)\r\n\r\nexternalFileReference = keynoteTable.GetExternalFileReference()\r\n\r\npath = externalFileReference.GetAbsolutePath()\r\n\r\npath_visible = ModelPathUtils.ConvertModelPathToUserVisiblePath(path)\r\n\r\n#Open .txt file\r\nif os.path.exists(path_visible):\r\n    subprocess.Popen(['notepad.exe', path_visible], shell=True)\r\n    OUT = \"Notepad opened\"\r\nelse:\r\n    OUT = \"File not found\"\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "782539ce5c9e412e9bc709da7fde8c67",
+      "Inputs": [
+        {
+          "Id": "eab7d3d6bb5841b9acb593211b384d48",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "0672777624af44fa937458399d277c2c",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.13",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "2.0",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.13.1.3887",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "782539ce5c9e412e9bc709da7fde8c67",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -125.95015965437381,
+        "Y": -244.96418378177066
+      }
+    ],
+    "Annotations": [],
+    "X": 662.38663298389406,
+    "Y": 548.098841041911,
+    "Zoom": 0.93224393253515125
+  }
+}
