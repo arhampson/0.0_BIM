@@ -2,7 +2,7 @@
   "Uuid": "04dcf320-8c90-4a10-8295-00fb9894f8c2",
   "IsCustomNode": false,
   "Description": "",
-  "Name": "DuplicateSheets",
+  "Name": "script",
   "ElementResolver": {
     "ResolutionMap": {}
   },
