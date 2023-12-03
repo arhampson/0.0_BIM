@@ -12,7 +12,7 @@
     {
       "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
       "NodeType": "PythonScriptNode",
-      "Code": "# Load the Python Standard and DesignScript Libraries\r\nimport clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System import Array\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\n\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Current doc/app/ui\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\n# Get Ids inuse\r\nInuse_ID_Box = []\r\n\r\nfor view in FilteredElementCollector(doc).OfClass(View).WhereElementIsNotElementType():\r\n    boxParam = view.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue)\r\n# Get levels and grid IDS where scope boxes may be assigned\r\ngridFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids) \r\nlevelFilter = ElementCategoryFilter(BuiltInCategory.OST_Levels)\r\ncatFilter = LogicalOrFilter(gridFilter, levelFilter)\r\n\r\nfor elem in FilteredElementCollector(doc).WherePasses(catFilter):\r\n    boxParam = elem.get_Parameter(BuiltInParameter.DATUM_VOLUME_OF_INTEREST)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue) \r\n# Get all IDS and delete\r\nToDelete_ID_Box = List[ElementId]()\r\n\r\nfor box in FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_VolumeOfInterest).WhereElementIsNotElementType():\r\n    if box.Id.IntegerValue in Inuse_ID_Box: continue\r\n    \r\n    ToDelete_ID_Box.Add(box.Id)\r\n\r\n# Delete elements\r\nwith Transaction(doc, \"Delete Unused Scopeboxes\") as tr:\r\n    tr.Start()\r\n    doc.Delete(ToDelete_ID_Box)\r\n    tr.Commit()\r\n    \r\n# Assign your output to the OUT variable.\r\nOUT = ToDelete_ID_Box",
+      "Code": "# Load the Python Standard and DesignScript Libraries\r\nimport clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System import Array\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\n\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Current doc/app/ui\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\n# Get Ids inuse\r\nInuse_ID_Box = []\r\n\r\nfor view in FilteredElementCollector(doc).OfClass(View).WhereElementIsNotElementType():\r\n    boxParam = view.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue)\r\n# Get levels and grid IDS where scope boxes may be assigned\r\ngridFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids) \r\nlevelFilter = ElementCategoryFilter(BuiltInCategory.OST_Levels)\r\ncatFilter = LogicalOrFilter(gridFilter, levelFilter)\r\n\r\nfor elem in FilteredElementCollector(doc).WherePasses(catFilter):\r\n    boxParam = elem.get_Parameter(BuiltInParameter.DATUM_VOLUME_OF_INTEREST)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue) \r\n# Get all IDS and delete\r\nToDelete_ID_Box = List[ElementId]()\r\nBox_Name = []\r\n\r\nfor box in FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_VolumeOfInterest).WhereElementIsNotElementType():\r\n    if box.Id.IntegerValue in Inuse_ID_Box: continue\r\n    \r\n    ToDelete_ID_Box.Add(box.Id)\r\n    Box_Name.append(box.Name)\r\n\r\n# Delete elements\r\nwith Transaction(doc, \"Delete Unused Scopeboxes\") as tr:\r\n    tr.Start()\r\n    doc.Delete(ToDelete_ID_Box)\r\n    tr.Commit()\r\n    \r\n# Assign your output to the OUT variable.\r\nOUT = Box_Name",
       "Engine": "CPython3",
       "VariableInputPorts": true,
       "Id": "fb50afe3932346e0a3610111e21c6859",
@@ -40,11 +40,176 @@
       ],
       "Replication": "Disabled",
       "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CustomNodes.Function, DynamoCore",
+      "FunctionSignature": "c1c01465-8e50-416b-909a-d9902aa0780b",
+      "FunctionType": "Graph",
+      "NodeType": "FunctionNode",
+      "Id": "02b4a05364a043019afeaf057d5bd14d",
+      "Inputs": [
+        {
+          "Id": "7f7efd00bc374a3db7a96eb83caa44d8",
+          "Name": "title",
+          "Description": "Title of the UI.\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "aab07c328cbf4704bb9d0ec5b73dd75e",
+          "Name": "body",
+          "Description": "Body text of the UI.\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "b2a9551e3785490b8d3faba4600f14ef",
+          "Name": "pass",
+          "Description": "Data to pass through\n\nvar[]..[]\nDefault value : null",
+          "UsingDefaultValue": true,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "ce5d93fd62754759a8b8c05d76c4dbbe",
+          "Name": "result",
+          "Description": "Passed through data. If canceled, will be null.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Displays a message box with a title/body and OK/cancel button. If OK is selected, the third input's data will be passed through."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "DSCore.List.Count@var[]..[]",
+      "Id": "d9bfbd45cfe847fbb9aa812a449d0648",
+      "Inputs": [
+        {
+          "Id": "469891d9e8f94af4941afe98b4204083",
+          "Name": "list",
+          "Description": "List to get the item count of.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "84934c729b2c4a7eb782880a3354cbe4",
+          "Name": "int",
+          "Description": "List length.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Returns the number of items stored in the given list.\n\nList.Count (list: var[]..[]): int"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "NodeType": "CodeBlockNode",
+      "Code": "\"Purge Unused Scopeboxes\";",
+      "Id": "2c3c0fab32fa49d3bfebda962f7f0c1d",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "c0ee61877cab402dbba70dc26a984c31",
+          "Name": "",
+          "Description": "Value of expression at line 1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "NodeType": "CodeBlockNode",
+      "Code": "x + \" scopeboxes deleted\";",
+      "Id": "7cc72f400d874be6a695ccb5471327fd",
+      "Inputs": [
+        {
+          "Id": "455e1f93891d4b2f8682708ec991306b",
+          "Name": "x",
+          "Description": "x",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "a354c0a4092a4046b92327c6f48d732b",
+          "Name": "",
+          "Description": "Value of expression at line 1",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly"
     }
   ],
-  "Connectors": [],
-  "Dependencies": [],
-  "NodeLibraryDependencies": [],
+  "Connectors": [
+    {
+      "Start": "ae384ebcb5ad4290bc8e50b670eb5f60",
+      "End": "469891d9e8f94af4941afe98b4204083",
+      "Id": "4334660149384d6bba243211299ff20c",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "84934c729b2c4a7eb782880a3354cbe4",
+      "End": "455e1f93891d4b2f8682708ec991306b",
+      "Id": "652929a37faa4ad49f43be188a736189",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "c0ee61877cab402dbba70dc26a984c31",
+      "End": "7f7efd00bc374a3db7a96eb83caa44d8",
+      "Id": "78bd09df4d0c4874a336a635bd749c12",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "a354c0a4092a4046b92327c6f48d732b",
+      "End": "aab07c328cbf4704bb9d0ec5b73dd75e",
+      "Id": "e37b7b8b2a7142fca1665b2751715809",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [
+    "c1c01465-8e50-416b-909a-d9902aa0780b"
+  ],
+  "NodeLibraryDependencies": [
+    {
+      "Name": "Crumple",
+      "Version": "2022.5.27",
+      "ReferenceType": "Package",
+      "Nodes": [
+        "02b4a05364a043019afeaf057d5bd14d"
+      ]
+    }
+  ],
   "Thumbnail": "",
   "GraphDocumentationURL": null,
   "ExtensionWorkspaceData": [
@@ -93,19 +258,59 @@
     "ConnectorPins": [],
     "NodeViews": [
       {
+        "Name": "Python Script",
+        "ShowGeometry": true,
         "Id": "fb50afe3932346e0a3610111e21c6859",
         "IsSetAsInput": false,
         "IsSetAsOutput": false,
-        "Name": "Python Script",
-        "ShowGeometry": true,
         "Excluded": false,
-        "X": 756.0,
-        "Y": 252.0
+        "X": 617.25623111403343,
+        "Y": 172.31704134348294
+      },
+      {
+        "Name": "© UI.Messenger",
+        "ShowGeometry": true,
+        "Id": "02b4a05364a043019afeaf057d5bd14d",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1555.2562311140334,
+        "Y": 92.90329134348292
+      },
+      {
+        "Name": "List.Count",
+        "ShowGeometry": true,
+        "Id": "d9bfbd45cfe847fbb9aa812a449d0648",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 891.25623111403343,
+        "Y": 183.73079134348291
+      },
+      {
+        "Name": "Code Block",
+        "ShowGeometry": true,
+        "Id": "2c3c0fab32fa49d3bfebda962f7f0c1d",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1153.2562311140334,
+        "Y": 35.730791343482935
+      },
+      {
+        "Name": "Code Block",
+        "ShowGeometry": true,
+        "Id": "7cc72f400d874be6a695ccb5471327fd",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 1153.2562311140334,
+        "Y": 183.73079134348291
       }
     ],
     "Annotations": [],
-    "X": 0.0,
-    "Y": 0.0,
-    "Zoom": 1.0
+    "X": 163.94443753226108,
+    "Y": 423.97910089982332,
+    "Zoom": 0.6959466735915969
   }
 }
