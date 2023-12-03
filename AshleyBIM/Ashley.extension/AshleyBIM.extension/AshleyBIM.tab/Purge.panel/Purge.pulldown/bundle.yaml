@@ -3,4 +3,5 @@ layout:
     - Purge_Unused_LineStyles
     - Purge_Unused_ViewTemplates
     - Purge_Empty_Keynotes
+    - Purge_Unused_Scopeboxes
     

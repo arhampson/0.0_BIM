@@ -1,0 +1,111 @@
+{
+  "Uuid": "cfc0055f-e6a9-408d-b5f1-c1903f444765",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "script",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "# Load the Python Standard and DesignScript Libraries\r\nimport clr\r\n\r\nimport sys\r\nsys.path.append('C:\\Program Files (x86)\\IronPython 2.7\\Lib')\r\n\r\nimport System\r\nfrom System import Array\r\nfrom System.Collections.Generic import *\r\n\r\nclr.AddReference('ProtoGeometry')\r\nfrom Autodesk.DesignScript.Geometry import *\r\n\r\nclr.AddReference(\"RevitNodes\")\r\nimport Revit\r\nclr.ImportExtensions(Revit.Elements)\r\nclr.ImportExtensions(Revit.GeometryConversion)\r\n\r\nclr.AddReference(\"RevitServices\")\r\nimport RevitServices\r\nfrom RevitServices.Persistence import DocumentManager \r\nfrom RevitServices.Transactions import TransactionManager \r\n\r\nclr.AddReference(\"RevitAPI\")\r\nclr.AddReference(\"RevitAPIUI\")\r\n\r\nimport Autodesk \r\nfrom Autodesk.Revit.DB import *\r\nfrom Autodesk.Revit.UI import *\r\n\r\n# Current doc/app/ui\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\nuiapp = DocumentManager.Instance.CurrentUIApplication \r\napp = uiapp.Application \r\nuidoc = uiapp.ActiveUIDocument\r\n\r\n# Get Ids inuse\r\nInuse_ID_Box = []\r\n\r\nfor view in FilteredElementCollector(doc).OfClass(View).WhereElementIsNotElementType():\r\n    boxParam = view.get_Parameter(BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue)\r\n# Get levels and grid IDS where scope boxes may be assigned\r\ngridFilter = ElementCategoryFilter(BuiltInCategory.OST_Grids) \r\nlevelFilter = ElementCategoryFilter(BuiltInCategory.OST_Levels)\r\ncatFilter = LogicalOrFilter(gridFilter, levelFilter)\r\n\r\nfor elem in FilteredElementCollector(doc).WherePasses(catFilter):\r\n    boxParam = elem.get_Parameter(BuiltInParameter.DATUM_VOLUME_OF_INTEREST)\r\n    if not boxParam: continue\r\n    \r\n    boxID = boxParam.AsElementId()\r\n    if boxID == ElementId.InvalidElementId: continue\r\n    \r\n    Inuse_ID_Box.append(boxID.IntegerValue) \r\n# Get all IDS and delete\r\nToDelete_ID_Box = List[ElementId]()\r\n\r\nfor box in FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_VolumeOfInterest).WhereElementIsNotElementType():\r\n    if box.Id.IntegerValue in Inuse_ID_Box: continue\r\n    \r\n    ToDelete_ID_Box.Add(box.Id)\r\n\r\n# Delete elements\r\nwith Transaction(doc, \"Delete Unused Scopeboxes\") as tr:\r\n    tr.Start()\r\n    doc.Delete(ToDelete_ID_Box)\r\n    tr.Commit()\r\n    \r\n# Assign your output to the OUT variable.\r\nOUT = ToDelete_ID_Box",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "fb50afe3932346e0a3610111e21c6859",
+      "Inputs": [
+        {
+          "Id": "c4df7ebb4cc145a7a7f4453e2a6b2ec4",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "ae384ebcb5ad4290bc8e50b670eb5f60",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    }
+  ],
+  "Connectors": [],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.13",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "2.0",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.13.1.3887",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "fb50afe3932346e0a3610111e21c6859",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Excluded": false,
+        "X": 756.0,
+        "Y": 252.0
+      }
+    ],
+    "Annotations": [],
+    "X": 0.0,
+    "Y": 0.0,
+    "Zoom": 1.0
+  }
+}
