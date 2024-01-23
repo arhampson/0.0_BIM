@@ -2,4 +2,5 @@ layout:
    - Batch_Duplicate
    - Batch_Revisions
    - Batch_TitleblockParameters_Update
+   - Batch_ViewportLabel_Change
     
